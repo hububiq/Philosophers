@@ -6,9 +6,11 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 15:33:12 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/01 18:43:59 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/02 13:50:32 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include <philo.h>
 
 unsigned long long ft_atoll(char *str) //ull to prevent overflowing in parseing.
 {
