@@ -6,19 +6,40 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 13:33:19 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/02 13:50:27 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/04 17:23:06 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <philo.h>
 
-void *routine(t_philo *philos)
+int init_philos(t_table **table)
 {
-			
+	int					i;
+	struct timeval		*time;
+	unsigned long long	quantity;
+
+	quantity = (*table)->number_of_philo;
+	i = 0;
+	(*table)->philos = malloc(sizeof(t_philo) * quantity);
+	if (!(*table)->philos)
+		return (1);
+	while (i < quantity)
+	{
+		(*table)->philos[i].philo_id = i + 1;
+		(*table)->philos[i].meals_eaten = 0;
+		(*table)->philos[i].last_meal_time = time->tv_sec;
+		(*table)->philos[i].last_meal_time = convert_print_time();
+		(*table)->philos[i].left_fork = (*table)->forks[i];
+		if (i == 0)
+			(*table)->philos[i].right_fork = (*table)->forks[quantity - 1];
+		else
+			(*table)->philos[i].right_fork = (*table)->forks[i - 1];
+		(*table)->philos[i].table = *table;
+		i++;
+	}
 }
 
-/*creating threads and mutexes. PHILOS STRUCTURE STILL TO INITIALISE. THEY DONT PRECISELY EQUAL TO THREADS.*/
-
+/*creating mutexes and threads*/
 int init_threads_mutexes(t_table **table)
 {
 	int				i;
@@ -26,47 +47,47 @@ int init_threads_mutexes(t_table **table)
 	pthread_mutex_t	*forks;
 	
 	i = 0;
-	(*table)->threads = malloc(sizeof(pthread_t) * ((*table)->number_of_philo + 1));
+	init_philos(table);
+	(*table)->threads = malloc(sizeof(pthread_t) * ((*table)->number_of_philo));
 	if (!(*table)->threads)
 		return (1);
-	(*table)->forks = malloc(sizeof(pthread_mutex_t) * ((*table)->number_of_philo + 1));
-	if (!(*table)->threads)
+	(*table)->forks = malloc(sizeof(pthread_mutex_t) * ((*table)->number_of_philo));
+	if (!(*table)->forks)
 		return (1);
-	forks = (*table)->forks; 			//is it assignable if its not set to any value?
-	threads_array = (*table)->threads;	//is it assignable if its not set to any value?
+	forks = (*table)->forks;
+	threads_array = (*table)->threads;
 	while (i < (*table)->number_of_philo)
 	{
 		if (pthread_mutex_init(&forks[i], NULL) != 0)
 			return (1);
-		if (pthread_create(threads_array[i], NULL, &routine, &(*table)->philos[i]) != 0);
-			return (1);
 		i++;
 	}
-    return (0);
-}
-
-int init_monitor_thread()
-{
-    return (0);
-}
-
-int init_philos(t_table **table)
-{
-	t_philo	*philosopher;
-	int		i;
-
-	i = 0;
-	
 	while (i < (*table)->number_of_philo)
 	{
-		philosopher = malloc(sizeof(t_philo));
-		if (!philosopher)
+		if (pthread_create(threads_array[i], NULL, &routine, &*table) != 0)
 			return (1);
-		((*table)->philos)[i] = philosopher;
-		philosopher->philo_id = i;
 		i++;
 	}
-	
+    return (0);
+}
+
+/*initialising also mutex for ending flag here!*/
+int init_monitor_thread(t_table **table)
+{
+	pthread_t	monitoring;
+	int			i;
+
+	(*table)->monitor = malloc(sizeof(pthread_t));
+	if (!(*table)->monitor)
+		return (1);
+	monitoring = (*table)->monitor;
+	if (pthread_mutex_init((*table)->end_mutex, NULL) != 0)
+		return (1);
+	if (pthread_mutex_init((*table)->monit_mutex, NULL) != 0)
+		return (1);
+	if (pthread_create(monitoring, NULL, &monitor_routine, &*table) != 0)
+		return (1);
+	return (0);
 }
 
 int init_data(char **arguments, t_table **table)
@@ -87,9 +108,13 @@ int init_data(char **arguments, t_table **table)
         if ((*table)->meals_to_eat == ULLONG_MAX)
             return (1);
     }
+	(*table)->full_philos = 0;
     (*table)->simulation_end = false;
     (*table)->forks = NULL;
     (*table)->threads = NULL;
     (*table)->philos = NULL;
+	(*table)->monitor = NULL;
+	(*table)->monit_mutex = NULL;
+	(*table)->end_mutex = NULL;
     return (0);
 }

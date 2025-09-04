@@ -6,15 +6,20 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 13:02:09 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/02 13:50:30 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/04 17:44:21 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-/*check for arguments validity, compare with int max*/
-/*create n thread in a loop, n descending from argv[1]*/
+
+//TO_DO   printf also need to have their own mutex.
+//TO_DO	  the check if all philos are full
+//TO_DO	  set output messages nicely and MUTEX EVERY PRINTF
+//TO_D0   implement every activity in routine ! 
+//TO_DO   consider initiating every mutex in one big function, so far I initiate in random places.
 
 #include "philo.h"
 
+/*check for arguments validity, compare with int max*/
 int main(int argc, char **argv)
 {
     t_table *table;
@@ -40,8 +45,9 @@ int main(int argc, char **argv)
         return (printf("Creating threads failed."), free_mem(&table), 1);
 	if (init_philos(&table))
         return (printf("Creating threads failed."), free_mem(&table), 1);
-    if (init_monitor_thread())/////
-        return (printf("Monitoring thread creation failed"), free_mem(&table), 1);
+    if (init_monitor_thread(&table))
+        return (printf("Monit thr. creation failed"), free_mem(&table), 1);
+	//here should be some function that start simulation? Aand equals the last meal time.
     if (join_destroy(&table))
         return (printf("Threads joining failed."), free_mem(&table), 1);
 	free_mem(&table);
