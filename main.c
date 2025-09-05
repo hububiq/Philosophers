@@ -6,16 +6,16 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 13:02:09 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/04 17:44:21 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/05 16:23:37 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 //TO_DO   printf also need to have their own mutex.
-//TO_DO	  the check if all philos are full
-//TO_DO	  set output messages nicely and MUTEX EVERY PRINTF
+//TO_DO	  implement print_status - set output messages nicely and MUTEX EVERY PRINTF
 //TO_D0   implement every activity in routine ! 
 //TO_DO   consider initiating every mutex in one big function, so far I initiate in random places.
+//TO_DO	  create helper function to print status (lock every printf)
 
 #include "philo.h"
 
