@@ -6,59 +6,66 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 14:38:27 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/04 17:40:47 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/05 16:23:34 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void *routine(void *argument)
+void *rout(void *argument)
 {
-	t_table 			*table;
-	int					i;
+	t_philo 			*philo;
 
-	i = 0;
-	table = (t_table *)argument;
-	while (i < table->number_of_philo)  //equaling the time
-	{
-		table->philos[i].last_meal_time = convert_print_time();
-		i++;
-	}
-	if (table->philos->philo_id % 2)
+	philo = (t_philo *)argument;
+	if (philo->philo_id % 2)
 		usleep(1000);
-	while (is_simulation_going(&table))
+	while (is_simulation_going(philo->table))
 	{	
-		//eat function (first pick fork - mutex_lock (one of philo[i] and one of philo[i - 1]))
-		//sleep function
-		//think function
+		philo_eating(philo);
+		philo_sleeping(philo);
+		philo_thinking(philo);
 	}
+	return (NULL);
 }
 
 /* this function constantly checking if the philo died.*/
-void	monitor_routine(void *argument)
+void	monit_routine(void *argument)
 {
 	t_table 			*table;
 	int					i;
 	unsigned long long	current_time;
+	int					everyone_full;
 
+	everyone_full = 0;
 	i = 0;
 	current_time = 0;
 	table = (t_table *)argument;
 	while (1)
 	{
-		if (i < table->number_of_philo)
+		i = 0;
+		while (i < table->number_of_philo)
 		{
-			pthread_mutex_lock(&table->monit_mutex);
+			pthread_mutex_lock(&table->philos[i].philo_mutex);
 			if ((convert_print_time() - table->philos[i].last_meal_time) > table->time_to_die)
+			{
+				pthread_mutex_lock(&table->end_mutex);
 				table->simulation_end = 1;
-			pthread_mutex_unlock(&table->monit_mutex);
+				pthread_mutex_unlock(&table->end_mutex);
+				pthread_mutex_lock(&table->print_mutex);
+				print_status(&table->philos[i], "died"); //set the timestamp correctly
+				pthread_mutex_unlock(&table->print_mutex);
+				pthread_mutex_unlock(&table->philos[i].philo_mutex);
+				break;
+			}
+			pthread_mutex_unlock(&table->philos[i].philo_mutex);
 			i++;
 		}
-		i++;
-		if (!is_simulation_going(&table))  //does monitoring thread sets it? or its just checking for it?
+		pthread_mutex_lock(&table->end_mutex);
+		if (table->full_philos == table->number_of_philo)
+			everyone_full = 1;
+		pthread_mutex_unlock(&table->end_mutex);
+		if (!is_simulation_going(table) || everyone_full) 
 			break;
-		usleep(1000); //little busy-wait to relax CPU
-		
-		/*the check if all philos are full*/
+		usleep(1000); //little busy-wait to relax CPU/
 	}	
 }

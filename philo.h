@@ -6,7 +6,7 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 10:54:29 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/04 17:25:44 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/05 16:09:53 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,12 @@
 typedef struct s_philo
 {
     int					philo_id;
+	int					meals_eaten;
     t_table				*table;
-    pthread_mutex_t		left_fork;
-    pthread_mutex_t		right_fork;
+    pthread_mutex_t		*left_fork;
+    pthread_mutex_t		*right_fork;
+	pthread_mutex_t		*philo_mutex;
     unsigned long long	last_meal_time;
-    int					meals_eaten; //***
 }   t_philo;
 
 typedef struct s_table
@@ -36,17 +37,20 @@ typedef struct s_table
     unsigned long long  time_to_eat;
     unsigned long long  time_to_sleep;
     unsigned long long  meals_to_eat;
-	unsigned long long	full_philos; //*** 
-    pthread_mutex_t     *forks;    //mutexes are essentialy forks!
+	unsigned long long	full_philos;
+    pthread_mutex_t     *forks;    //fork are essentialy mutexes!
     bool                simulation_end;
 	pthread_mutex_t		*end_mutex;
-    pthread_t           *threads; //not equal to philosophers.
+    pthread_t           *threads;
 	pthread_t			monitor;
-	pthread_mutex_t		*monit_mutex;
+	pthread_mutex_t		*print_mutex;
     t_philo             *philos;
 }   t_table;
 
-void				*routine(void *argument);
-void				monitor_routine(void *argument);
+void				*rout(void *argument);
+void				monit_routine(void *argument);
 unsigned long long	convert_print_time();
 int					is_simulation_going(t_table **table);
+void				philo_eating(t_table **table);
+void				philo_sleeping(t_table **table);
+void				philo_thinking(t_table **table);

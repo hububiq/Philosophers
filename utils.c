@@ -6,23 +6,28 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 15:33:12 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/04 17:39:52 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/05 16:23:33 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <philo.h>
 
-int is_simulation_going(t_table **table)
+void print_status()
 {
-	phtread_mutex_lock((*table)->end_mutex);
-	if ((*table)->simulation_end)
+	
+}
+
+int is_simulation_going(t_table *table)
+{
+	phtread_mutex_lock(table->end_mutex);
+	if (table->simulation_end)
 	{
-		phtread_mutex_unlock(&(*table)->end_mutex);
+		phtread_mutex_unlock(table->end_mutex);
 		return (1);
 	}
 	else
 	{
-		phtread_mutex_unlock(&(*table)->end_mutex);
+		phtread_mutex_unlock(table->end_mutex);
 		return (0);
 	}
 }
@@ -42,10 +47,11 @@ unsigned long long convert_print_time()
 }
 
 
-unsigned long long ft_atoll(char *str) //ull to prevent overflowing in parseing.
+/* Type ull to prevent overflowing in parseing.*/
+unsigned long long ft_atoll(char *str)
 {
     int                 i;
-    unsigned long long  number; //defined like this, i assume user will enter positive number. if not, it will return ULLONG_MAX
+    unsigned long long  number;
 
     i = 0;
     number = 0;
@@ -64,3 +70,4 @@ unsigned long long ft_atoll(char *str) //ull to prevent overflowing in parseing.
         return (ULLONG_MAX);
     return (number);
 }
+

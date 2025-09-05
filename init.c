@@ -6,7 +6,7 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 13:33:19 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/04 17:23:06 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/05 16:23:36 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int init_philos(t_table **table)
 {
 	int					i;
-	struct timeval		*time;
+	struct timeval		time;
 	unsigned long long	quantity;
 
 	quantity = (*table)->number_of_philo;
@@ -27,65 +27,59 @@ int init_philos(t_table **table)
 	{
 		(*table)->philos[i].philo_id = i + 1;
 		(*table)->philos[i].meals_eaten = 0;
-		(*table)->philos[i].last_meal_time = time->tv_sec;
 		(*table)->philos[i].last_meal_time = convert_print_time();
-		(*table)->philos[i].left_fork = (*table)->forks[i];
+		(*table)->philos[i].left_fork = &(*table)->forks[i];
 		if (i == 0)
-			(*table)->philos[i].right_fork = (*table)->forks[quantity - 1];
+			(*table)->philos[i].right_fork = &(*table)->forks[quantity - 1]; //ampersand! im giving the address, not assiging copy
 		else
-			(*table)->philos[i].right_fork = (*table)->forks[i - 1];
+			(*table)->philos[i].right_fork = &(*table)->forks[i - 1];
 		(*table)->philos[i].table = *table;
+		if (pthread_mutex_init(&(*table)->philos[i].philo_mutex, NULL) != 0)
+			return (1);
 		i++;
 	}
 }
 
 /*creating mutexes and threads*/
-int init_threads_mutexes(t_table **table)
+int init_threads_mutexes(t_table **tbl)
 {
 	int				i;
-	pthread_t		*threads_array;
+	pthread_t		*threads_arr;
 	pthread_mutex_t	*forks;
 	
 	i = 0;
-	init_philos(table);
-	(*table)->threads = malloc(sizeof(pthread_t) * ((*table)->number_of_philo));
-	if (!(*table)->threads)
+	init_philos(tbl);
+	(*tbl)->threads = malloc(sizeof(pthread_t) * ((*tbl)->number_of_philo));
+	if (!(*tbl)->threads)
 		return (1);
-	(*table)->forks = malloc(sizeof(pthread_mutex_t) * ((*table)->number_of_philo));
-	if (!(*table)->forks)
+	(*tbl)->forks = malloc(sizeof(pthread_mutex_t) * ((*tbl)->number_of_philo));
+	if (!(*tbl)->forks)
 		return (1);
-	forks = (*table)->forks;
-	threads_array = (*table)->threads;
-	while (i < (*table)->number_of_philo)
+	forks = (*tbl)->forks;
+	threads_arr = (*tbl)->threads;
+	while (i < (*tbl)->number_of_philo)
 	{
 		if (pthread_mutex_init(&forks[i], NULL) != 0)
 			return (1);
 		i++;
 	}
-	while (i < (*table)->number_of_philo)
+	while (i < (*tbl)->number_of_philo)
 	{
-		if (pthread_create(threads_array[i], NULL, &routine, &*table) != 0)
+		if (pthread_create(&threads_arr[i], NULL, &rout, &(*tbl)->philos[i]))
 			return (1);
 		i++;
 	}
     return (0);
 }
 
-/*initialising also mutex for ending flag here!*/
-int init_monitor_thread(t_table **table)
+/*initialising also mutexes for ending flag and printing here*/
+int init_monitor_thread(t_table **tbl)
 {
-	pthread_t	monitoring;
-	int			i;
-
-	(*table)->monitor = malloc(sizeof(pthread_t));
-	if (!(*table)->monitor)
+	if (pthread_mutex_init(&(*tbl)->end_mutex, NULL) != 0)
 		return (1);
-	monitoring = (*table)->monitor;
-	if (pthread_mutex_init((*table)->end_mutex, NULL) != 0)
+	if (pthread_mutex_init(&(*tbl)->print_mutex, NULL) != 0)
 		return (1);
-	if (pthread_mutex_init((*table)->monit_mutex, NULL) != 0)
-		return (1);
-	if (pthread_create(monitoring, NULL, &monitor_routine, &*table) != 0)
+	if (pthread_create(&(*tbl)->monitor, NULL, &monit_routine, *tbl) != 0)
 		return (1);
 	return (0);
 }
@@ -110,11 +104,11 @@ int init_data(char **arguments, t_table **table)
     }
 	(*table)->full_philos = 0;
     (*table)->simulation_end = false;
-    (*table)->forks = NULL;
-    (*table)->threads = NULL;
-    (*table)->philos = NULL;
-	(*table)->monitor = NULL;
-	(*table)->monit_mutex = NULL;
-	(*table)->end_mutex = NULL;
+    //(*table)->forks = NULL;
+    //(*table)->threads = NULL;
+    //(*table)->philos = NULL;
+	//(*table)->monitor = NULL;
+	//(*table)->end_mutex = NULL;
+	//(*table)->print_mutex = NULL;
     return (0);
 }
