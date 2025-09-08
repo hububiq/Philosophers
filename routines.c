@@ -6,7 +6,7 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 14:38:27 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/05 16:23:34 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/08 14:57:16 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	monit_routine(void *argument)
 	while (1)
 	{
 		i = 0;
-		while (i < table->number_of_philo)
+		while (i < table->numof_philo)
 		{
 			pthread_mutex_lock(&table->philos[i].philo_mutex);
 			if ((convert_print_time() - table->philos[i].last_meal_time) > table->time_to_die)
@@ -51,9 +51,7 @@ void	monit_routine(void *argument)
 				pthread_mutex_lock(&table->end_mutex);
 				table->simulation_end = 1;
 				pthread_mutex_unlock(&table->end_mutex);
-				pthread_mutex_lock(&table->print_mutex);
-				print_status(&table->philos[i], "died"); //set the timestamp correctly
-				pthread_mutex_unlock(&table->print_mutex);
+				print_status(table, table->philos[i].philo_id, "died");
 				pthread_mutex_unlock(&table->philos[i].philo_mutex);
 				break;
 			}
@@ -61,8 +59,11 @@ void	monit_routine(void *argument)
 			i++;
 		}
 		pthread_mutex_lock(&table->end_mutex);
-		if (table->full_philos == table->number_of_philo)
+		if (table->full_philos == table->numof_philo)
+		{
 			everyone_full = 1;
+			table->simulation_end = 1;
+		}
 		pthread_mutex_unlock(&table->end_mutex);
 		if (!is_simulation_going(table) || everyone_full) 
 			break;
