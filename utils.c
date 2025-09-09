@@ -6,29 +6,40 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 15:33:12 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/05 16:23:33 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/08 14:59:52 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <philo.h>
 
-void print_status()
+/*usleep doesnt need mutex bc it operates on read-only data and doesnt change any shared data*/
+/*print DOES need mutex because it not only reads but writes to stdout also, stdout is shared*/
+/*mutex is to be performed inside print_status. not around print_status in calling function!!*/
+/*important to check if the simulation is going because there shouldn't be "sleeping" msg after death*/
+void print_status(t_table *table, unsigned long long philo_id, char *message)
 {
-	
+	struct timeval time;
+
+	if (is_simulation_going(table))
+	{
+		pthread_mutex_lock(&table->print_mutex);
+		printf("%llu %llu %s", convert_print_time, philo_id, message);
+		pthread_mutex_unlock(&table->print_mutex);
+	}
 }
 
 int is_simulation_going(t_table *table)
 {
-	phtread_mutex_lock(table->end_mutex);
+	phtread_mutex_lock(&table->end_mutex);
 	if (table->simulation_end)
 	{
-		phtread_mutex_unlock(table->end_mutex);
-		return (1);
+		phtread_mutex_unlock(&table->end_mutex);
+		return (0);
 	}
 	else
 	{
-		phtread_mutex_unlock(table->end_mutex);
-		return (0);
+		phtread_mutex_unlock(&table->end_mutex);
+		return (1);
 	}
 }
 

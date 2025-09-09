@@ -6,20 +6,22 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 13:02:09 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/05 16:23:37 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/08 14:56:23 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+/*important note - if I define in struct pointer to mutex, I need to alocate memory for it and mutex_init.*/
+/*if its only object wihtout pointer, it just need ampersand to pass the address of the object (and of course init too)*/
 
-//TO_DO   printf also need to have their own mutex.
-//TO_DO	  implement print_status - set output messages nicely and MUTEX EVERY PRINTF
-//TO_D0   implement every activity in routine ! 
-//TO_DO   consider initiating every mutex in one big function, so far I initiate in random places.
-//TO_DO	  create helper function to print status (lock every printf)
+//TO_DO   MAKEFILE !!!!
+//TO_DO   clear the functions to 25lines
+//TO_DO	  TIMESTAMP in print_status !!!!
+
 
 #include "philo.h"
 
 /*check for arguments validity, compare with int max*/
+
 int main(int argc, char **argv)
 {
     t_table *table;
@@ -31,24 +33,22 @@ int main(int argc, char **argv)
         return (1);
     if (init_data(argv, &table))
         return (printf("Invalid data"), 1);
-    if (table->number_of_philo > INT_MAX || table->time_to_die > INT_MAX
+    if (table->numof_philo > INT_MAX || table->time_to_die > INT_MAX
         || table->time_to_eat > INT_MAX || table->time_to_sleep > INT_MAX)
         return (printf("Wrong input"), free_mem(&table), 1);
-    if (table->number_of_philo == 0)
+    if (table->numof_philo == 0)
         return (printf("Must have at least one philosopher\n"), 1);
     if (argc == 6)
     {
-        if (table->meals_to_eat > INT_MAX)
+		if (table->meals_to_eat > INT_MAX)
             return (printf("Wrong input"), free_mem(&table), 1);
-    }
+	}
     if (init_threads_mutexes(&table))
-        return (printf("Creating threads failed."), free_mem(&table), 1);
-	if (init_philos(&table))
         return (printf("Creating threads failed."), free_mem(&table), 1);
     if (init_monitor_thread(&table))
         return (printf("Monit thr. creation failed"), free_mem(&table), 1);
-	//here should be some function that start simulation? Aand equals the last meal time.
     if (join_destroy(&table))
         return (printf("Threads joining failed."), free_mem(&table), 1);
-	free_mem(&table);
+	free_mem(&table); //could be moved inside join_destroy. then I dont need ampersand and double pointer because its nothing to pass later on.
+	return (0);
 }
