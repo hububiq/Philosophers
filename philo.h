@@ -6,9 +6,12 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 10:54:29 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/08 12:47:45 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/09 15:22:00 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#ifndef PHILO_H
+# define PHILO_H
 
 #include <sys/syscall.h>
 #include <unistd.h>
@@ -19,17 +22,7 @@
 #include <limits.h>
 #include <stdbool.h>
 
-typedef struct s_philo
-{
-    unsigned long long	philo_id;
-	int					meals_eaten;
-    t_table				*table;
-    pthread_mutex_t		*left_fork;	 //inited but as forks[i]
-    pthread_mutex_t		*right_fork;  //inited but as forks[i]
-	pthread_mutex_t		philo_mutex; //inited
-    unsigned long long	last_meal_time;
-}   t_philo;
-
+struct t_philo;
 typedef struct s_table
 {
     unsigned long long  numof_philo;
@@ -44,13 +37,43 @@ typedef struct s_table
     pthread_mutex_t     *forks;    //fork are essentialy mutexes!
 	pthread_mutex_t		end_mutex;	//inited
 	pthread_mutex_t		print_mutex; //inited
-    t_philo             *philos;
+    struct t_philo      *philos;
 }   t_table;
 
+typedef struct s_philo
+{
+    unsigned long long	philo_id;
+	int					meals_eaten;
+	t_table				*table;
+    pthread_mutex_t		*left_fork;	 //inited but as forks[i]
+    pthread_mutex_t		*right_fork;  //inited but as forks[i]
+	pthread_mutex_t		philo_mutex; //inited
+    unsigned long long	last_meal_time;
+}   t_philo;
+
+/*init.c*/
+int					init_philos(t_table **table);
+int					init_threads_mutexes(t_table **tbl);
+int					init_monitor_thread(t_table **tbl);
+int					init_data(char **arguments, t_table **table);
+
+/*routines.c*/
 void				*rout(void *argument);
 void				monit_routine(void *argument);
+
+/*routines_functions.c*/
+void				philo_eating(t_philo *philo);
+void				philo_sleeping(t_philo *philo);
+void				philo_thinking(t_philo *philo);
+
+/*clean.c*/
+void				free_mem(t_table **table);
+int					destroy_philo_mutex(t_table *table);
+int					join_destroy(t_table **table);
+
+/*utils.c*/
+void 				print_status(t_table *tbl, unsigned long long philo_id, char *msg);
+int 				is_simulation_going(t_table *table);
 unsigned long long	convert_print_time();
-int					is_simulation_going(t_table **table);
-void				philo_eating(t_table **table);
-void				philo_sleeping(t_table **table);
-void				philo_thinking(t_table **table);
+unsigned long long	ft_atoll(char *str);
+#endif

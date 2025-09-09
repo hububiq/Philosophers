@@ -6,7 +6,7 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 15:33:12 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/08 14:59:52 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/09 14:27:06 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,18 @@
 /*print DOES need mutex because it not only reads but writes to stdout also, stdout is shared*/
 /*mutex is to be performed inside print_status. not around print_status in calling function!!*/
 /*important to check if the simulation is going because there shouldn't be "sleeping" msg after death*/
-void print_status(t_table *table, unsigned long long philo_id, char *message)
+void print_status(t_table *tbl, unsigned long long philo_id, char *msg)
 {
-	struct timeval time;
+	struct timeval t;
 
-	if (is_simulation_going(table))
+	pthread_mutex_lock(&tbl->print_mutex);
+	if (is_simulation_going(tbl))
 	{
-		pthread_mutex_lock(&table->print_mutex);
-		printf("%llu %llu %s", convert_print_time, philo_id, message);
-		pthread_mutex_unlock(&table->print_mutex);
+
+		gettimeofday(&time, NULL);
+		printf("%llu %llu %s\n", t.tv_sec*1000 + t.tv_usec/1000, philo_id, msg); //not sure if its gonna be correct timestamp
 	}
+	pthread_mutex_unlock(&tbl->print_mutex);
 }
 
 int is_simulation_going(t_table *table)

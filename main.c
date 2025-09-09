@@ -6,17 +6,17 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 13:02:09 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/08 14:56:23 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/09 14:56:15 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+//TO_DO   If convert_print_time can be without arguments?
+//TO_DO   clear the functions to 25lines: main, init_threads_mutexes, monit_routine
+
+
+
 /*important note - if I define in struct pointer to mutex, I need to alocate memory for it and mutex_init.*/
 /*if its only object wihtout pointer, it just need ampersand to pass the address of the object (and of course init too)*/
-
-//TO_DO   MAKEFILE !!!!
-//TO_DO   clear the functions to 25lines
-//TO_DO	  TIMESTAMP in print_status !!!!
-
 
 #include "philo.h"
 
