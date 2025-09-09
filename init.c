@@ -6,11 +6,11 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 13:33:19 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/08 14:50:59 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/09 15:05:45 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <philo.h>
+#include "philo.h"
 
 /*im assigning left and right forks with ampersand because they are not a photocopy! it must be a pointer to the same mutex*/
 
