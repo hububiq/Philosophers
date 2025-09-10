@@ -6,7 +6,7 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 10:54:29 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/09 15:22:00 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/10 15:39:35 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,10 @@
 #include <limits.h>
 #include <stdbool.h>
 
-struct t_philo;
+//typedef alias vs struct tag name*
+
+/*forward declaration because of circular structures' dependencies*/
+struct s_philo;
 typedef struct s_table
 {
     unsigned long long  numof_philo;
@@ -37,13 +40,13 @@ typedef struct s_table
     pthread_mutex_t     *forks;    //fork are essentialy mutexes!
 	pthread_mutex_t		end_mutex;	//inited
 	pthread_mutex_t		print_mutex; //inited
-    struct t_philo      *philos;
+    struct s_philo      *philos;
 }   t_table;
 
 typedef struct s_philo
 {
     unsigned long long	philo_id;
-	int					meals_eaten;
+	unsigned long long	meals_eaten;
 	t_table				*table;
     pthread_mutex_t		*left_fork;	 //inited but as forks[i]
     pthread_mutex_t		*right_fork;  //inited but as forks[i]
@@ -59,7 +62,7 @@ int					init_data(char **arguments, t_table **table);
 
 /*routines.c*/
 void				*rout(void *argument);
-void				monit_routine(void *argument);
+void				*monit_routine(void *argument);
 
 /*routines_functions.c*/
 void				philo_eating(t_philo *philo);
@@ -68,7 +71,7 @@ void				philo_thinking(t_philo *philo);
 
 /*clean.c*/
 void				free_mem(t_table **table);
-int					destroy_philo_mutex(t_table *table);
+int					destroy_philo_mutex(t_table **table);
 int					join_destroy(t_table **table);
 
 /*utils.c*/

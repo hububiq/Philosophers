@@ -6,7 +6,7 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 14:38:27 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/08 15:02:09 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/10 15:28:22 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,12 @@ void *rout(void *argument)
 }
 
 /* this function constantly checking if the philo died.*/
-void	monit_routine(void *argument)
+void	*monit_routine(void *argument)
 {
 	t_table 			*table;
-	int					i;
+	unsigned long long	i;
 	unsigned long long	current_time;
-	int					everyone_full;
 
-	everyone_full = 0;
 	i = 0;
 	current_time = 0;
 	table = (t_table *)argument;
@@ -50,23 +48,21 @@ void	monit_routine(void *argument)
 			{
 				pthread_mutex_lock(&table->end_mutex);
 				table->simulation_end = 1;
-				pthread_mutex_unlock(&table->end_mutex);
 				print_status(table, table->philos[i].philo_id, "died");
+				pthread_mutex_unlock(&table->end_mutex);
 				pthread_mutex_unlock(&table->philos[i].philo_mutex);
-				break;
+				return (NULL);
 			}
 			pthread_mutex_unlock(&table->philos[i].philo_mutex);
 			i++;
 		}
 		pthread_mutex_lock(&table->end_mutex);
 		if (table->full_philos == table->numof_philo)
-		{
-			everyone_full = 1;
 			table->simulation_end = 1;
-		}
 		pthread_mutex_unlock(&table->end_mutex);
-		if (!is_simulation_going(table) || everyone_full) 
+		if (is_simulation_going(table) == 0)
 			break;
 		usleep(1000); //little busy-wait to relax CPU/
-	}	
+	}
+	return (NULL);
 }

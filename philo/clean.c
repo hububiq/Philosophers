@@ -6,7 +6,7 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/02 10:00:36 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/08 15:02:07 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/10 15:39:20 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,17 @@ void free_mem(t_table **table)
 		free((*table)->philos);
 	if ((*table)->forks)
 		free((*table)->forks);
-    free(table);
+    free(*table);
 }
 
-int destroy_philo_mutex(t_table *table)
+int destroy_philo_mutex(t_table **table)
 {
-	int i;
+	unsigned long long	i;
 
 	i = 0;
-	while (i < table->numof_philo)
+	while (i < (*table)->numof_philo)
 	{
-		if (pthread_mutex_destroy(&table->philos[i].philo_mutex) != 0)
+		if (pthread_mutex_destroy(&(*table)->philos[i].philo_mutex) != 0)
 				return (1);
 		i++;
 	}
@@ -43,7 +43,7 @@ and then destroy mutexes*/
 
 int	join_destroy(t_table **table)
 {
-	int				i;
+	unsigned long long	i;
 		
 	i = 0;
 	while ((i < (*table)->numof_philo))
@@ -61,10 +61,11 @@ int	join_destroy(t_table **table)
 			return (1);
 		i++;
 	}
-	if (destroy_philo_mutex(*table) != 0)
+	if (destroy_philo_mutex(table) != 0)
 		return (1);
-	if (pthread_mutex_destroy(&(*table)->end_mutex) != 0
-			|| pthread_mutex_destroy(&(*table)->print_mutex) != 0)
+	if (pthread_mutex_destroy(&(*table)->end_mutex) != 0)
+		return (1);
+	if (pthread_mutex_destroy(&(*table)->print_mutex) != 0)
 		return (1);
 	return (0);
 }
