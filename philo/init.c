@@ -6,7 +6,7 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 13:33:19 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/09 15:05:45 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/10 15:50:57 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 int init_philos(t_table **table)
 {
-	int					i;
+	unsigned long long	i;
 	unsigned long long	quantity;
 
 	quantity = (*table)->numof_philo;
@@ -36,6 +36,7 @@ int init_philos(t_table **table)
 			return (1);
 		i++;
 	}
+	return (0);
 }
 
 /*creating mutexes and threads*/
@@ -43,8 +44,7 @@ int init_philos(t_table **table)
 
 int init_threads_mutexes(t_table **tbl)
 {
-	int					i;
-	unsigned long long	quantity;
+	unsigned long long	i;
 	
 	i = 0;
 	(*tbl)->philos = malloc(sizeof(t_philo) * ((*tbl)->numof_philo));
@@ -58,8 +58,12 @@ int init_threads_mutexes(t_table **tbl)
 			return (1);
 		i++;
 	}
-	if (init_philos(&tbl))
-        return (printf("Creating threads failed."), free_mem(&tbl), 1);
+	if (pthread_mutex_init(&(*tbl)->end_mutex, NULL) != 0)
+		return (1);
+	if (pthread_mutex_init(&(*tbl)->print_mutex, NULL) != 0)
+	 	return (1);
+	if (init_philos(tbl))
+        return (printf("Creating threads failed."), free_mem(tbl), 1);
 	
 	i = 0;
 	while (i < (*tbl)->numof_philo)
@@ -75,10 +79,6 @@ int init_threads_mutexes(t_table **tbl)
 
 int init_monitor_thread(t_table **tbl)
 {
-	if (pthread_mutex_init(&(*tbl)->end_mutex, NULL) != 0)
-		return (1);
-	if (pthread_mutex_init(&(*tbl)->print_mutex, NULL) != 0)
-	 	return (1);
 	if (pthread_create(&(*tbl)->monitor, NULL, &monit_routine, *tbl) != 0)
 		return (1);
 	return (0);
