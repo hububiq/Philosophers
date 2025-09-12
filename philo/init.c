@@ -6,7 +6,7 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 13:33:19 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/10 15:50:57 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/11 16:37:59 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@ int init_threads_mutexes(t_table **tbl)
 	 	return (1);
 	if (init_philos(tbl))
         return (printf("Creating threads failed."), free_mem(tbl), 1);
-	
 	i = 0;
 	while (i < (*tbl)->numof_philo)
 	{
@@ -72,6 +71,8 @@ int init_threads_mutexes(t_table **tbl)
 			return (1);
 		i++;
 	}
+	if (init_monitor_thread(tbl))
+         return (printf("Monit thr. creation failed"), printf("tutaj: 2"), join_destroy(tbl), 1);
     return (0);
 }
 

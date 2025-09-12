@@ -6,7 +6,7 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 10:54:29 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/10 15:39:35 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/12 12:20:33 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,9 @@ typedef struct s_table
 	bool                simulation_end;
 	pthread_t           *threads;
 	pthread_t			monitor;
-    pthread_mutex_t     *forks;    //fork are essentialy mutexes!
-	pthread_mutex_t		end_mutex;	//inited
-	pthread_mutex_t		print_mutex; //inited
+    pthread_mutex_t     *forks;
+	pthread_mutex_t		end_mutex;
+	pthread_mutex_t		print_mutex;
     struct s_philo      *philos;
 }   t_table;
 
@@ -48,9 +48,9 @@ typedef struct s_philo
     unsigned long long	philo_id;
 	unsigned long long	meals_eaten;
 	t_table				*table;
-    pthread_mutex_t		*left_fork;	 //inited but as forks[i]
-    pthread_mutex_t		*right_fork;  //inited but as forks[i]
-	pthread_mutex_t		philo_mutex; //inited
+    pthread_mutex_t		*left_fork;
+    pthread_mutex_t		*right_fork;
+	pthread_mutex_t		philo_mutex;
     unsigned long long	last_meal_time;
 }   t_philo;
 
@@ -79,4 +79,5 @@ void 				print_status(t_table *tbl, unsigned long long philo_id, char *msg);
 int 				is_simulation_going(t_table *table);
 unsigned long long	convert_print_time();
 unsigned long long	ft_atoll(char *str);
+void				custom_usleep(unsigned long long time);
 #endif
