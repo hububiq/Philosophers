@@ -3,7 +3,7 @@ NAME = philo
 CFLAGS = -Wall -Wextra -Werror -pthread
 OBJ_DIR = obj
 RM = rm -f
-CSRC = main.c init.c routines.c routine_functions.c clean.c utils.c
+CSRC = main.c init.c mem_mutexes.c routines.c routine_functions.c clean.c utils.c
 #prefix to add obj/.c
 COBJ = $(addprefix ${OBJ_DIR}/, ${CSRC:.c=.o})
 

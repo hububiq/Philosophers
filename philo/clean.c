@@ -6,13 +6,13 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/02 10:00:36 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/12 12:02:44 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/15 10:32:54 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void free_mem(t_table **table)
+void	free_mem(t_table **table)
 {
 	if ((*table)->threads)
 		free((*table)->threads);
@@ -20,10 +20,10 @@ void free_mem(t_table **table)
 		free((*table)->philos);
 	if ((*table)->forks)
 		free((*table)->forks);
-    free(*table);
+	free(*table);
 }
 
-int destroy_philo_mutex(t_table **table)
+int	destroy_philo_mutex(t_table **table)
 {
 	unsigned long long	i;
 
@@ -31,20 +31,20 @@ int destroy_philo_mutex(t_table **table)
 	while (i < (*table)->numof_philo)
 	{
 		if (pthread_mutex_destroy(&(*table)->philos[i].philo_mutex) != 0)
-				return (1);
+			return (1);
 		i++;
 	}
 	return (0);
 }
 
-/*MUST NOT destroy mutexes that are used by monitor while monitor thread is still going. need to wait for monitor first 
-and then destroy mutexes*/
-/*first join all threads, then destroy philo mutexes, lastly destroy global mutexes*/
-
+/*MUST NOT destroy mutexes that are used by monitor while monitor thread
+ is still going. need to wait for monitor first and then destroy mutexes*/
+/*first join all threads, then destroy philo mutexes,
+	lastly destroy global mutexes*/
 int	join_destroy(t_table **table)
 {
 	unsigned long long	i;
-		
+
 	i = 0;
 	while ((i < (*table)->numof_philo))
 	{
