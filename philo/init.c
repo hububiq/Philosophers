@@ -6,15 +6,15 @@
 /*   By: hgatarek <hgatarek@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 13:33:19 by hgatarek          #+#    #+#             */
-/*   Updated: 2025/09/11 16:37:59 by hgatarek         ###   ########.fr       */
+/*   Updated: 2025/09/15 10:49:12 by hgatarek         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-/*im assigning left and right forks with ampersand because they are not a photocopy! it must be a pointer to the same mutex*/
-
-int init_philos(t_table **table)
+/*im assigning left and right forks with ampersand
+because they are not a photocopy! it must be a pointer to the same mutex*/
+int	init_philos(t_table **table)
 {
 	unsigned long long	i;
 	unsigned long long	quantity;
@@ -39,71 +39,67 @@ int init_philos(t_table **table)
 	return (0);
 }
 
-/*creating mutexes and threads*/
-/*philos also malloced here, not locally anywhere else*/
+void	start_timer(t_table **tbl)
+{
+	struct timeval		t;
 
-int init_threads_mutexes(t_table **tbl)
+	gettimeofday(&t, NULL);
+	(*tbl)->simulation_start = t.tv_sec * 1000 + t.tv_usec / 1000;
+}
+
+/*creating mutexes and threads*/
+/*philos also malloced here, NOT locally anywhere else*/
+int	init_threads_mutexes(t_table **tbl)
 {
 	unsigned long long	i;
-	
+
 	i = 0;
-	(*tbl)->philos = malloc(sizeof(t_philo) * ((*tbl)->numof_philo));
-	(*tbl)->threads = malloc(sizeof(pthread_t) * ((*tbl)->numof_philo));
-	(*tbl)->forks = malloc(sizeof(pthread_mutex_t) * ((*tbl)->numof_philo));
-	if (!(*tbl)->philos || !(*tbl)->threads || !(*tbl)->forks)
+	if (allocate_mem(tbl))
 		return (1);
-	while (i < (*tbl)->numof_philo)
-	{
-		if (pthread_mutex_init(&(*tbl)->forks[i], NULL) != 0)
-			return (1);
-		i++;
-	}
-	if (pthread_mutex_init(&(*tbl)->end_mutex, NULL) != 0)
+	if (init_mutexes(tbl))
 		return (1);
-	if (pthread_mutex_init(&(*tbl)->print_mutex, NULL) != 0)
-	 	return (1);
 	if (init_philos(tbl))
-        return (printf("Creating threads failed."), free_mem(tbl), 1);
-	i = 0;
+		return (printf("Creating threads failed."), free_mem(tbl), 1);
+	start_timer(tbl);
 	while (i < (*tbl)->numof_philo)
 	{
-		if (pthread_create(&(*tbl)->threads[i], NULL, &rout, &(*tbl)->philos[i]))
+		if (pthread_create(&(*tbl)->threads[i], NULL, &rout,
+				&(*tbl)->philos[i]))
 			return (1);
 		i++;
 	}
 	if (init_monitor_thread(tbl))
-         return (printf("Monit thr. creation failed"), printf("tutaj: 2"), join_destroy(tbl), 1);
-    return (0);
+		return (printf("Monit thr. init failed"), join_destroy(tbl), 1);
+	return (0);
 }
 
-/*initialising also mutexes for ending flag and printing here*/
-
-int init_monitor_thread(t_table **tbl)
+int	init_monitor_thread(t_table **tbl)
 {
 	if (pthread_create(&(*tbl)->monitor, NULL, &monit_routine, *tbl) != 0)
 		return (1);
 	return (0);
 }
 
-int init_data(char **arguments, t_table **table)
+int	init_data(char **arguments, t_table **table)
 {
-    (*table)->numof_philo = ft_atoll(arguments[1]);
-    (*table)->time_to_die = ft_atoll(arguments[2]);
-    (*table)->time_to_eat = ft_atoll(arguments[3]);
-    (*table)->time_to_sleep = ft_atoll(arguments[4]);
-    if ((*table)->numof_philo == ULLONG_MAX
-        || (*table)->time_to_die == ULLONG_MAX
-        || (*table)->time_to_eat == ULLONG_MAX
-        || (*table)->time_to_sleep == ULLONG_MAX)
-        return (1);
-    (*table)->meals_to_eat = 0; //default, if there is no arg[5]
-    if (arguments[5])
-    {
-        (*table)->meals_to_eat = ft_atoll(arguments[5]);
-        if ((*table)->meals_to_eat == ULLONG_MAX)
-            return (1);
-    }
+	(*table)->numof_philo = ft_atoll(arguments[1]);
+	(*table)->time_to_die = ft_atoll(arguments[2]);
+	(*table)->time_to_eat = ft_atoll(arguments[3]);
+	(*table)->time_to_sleep = ft_atoll(arguments[4]);
+	if ((*table)->numof_philo == ULLONG_MAX
+		|| (*table)->time_to_die == ULLONG_MAX
+		|| (*table)->time_to_eat == ULLONG_MAX
+		|| (*table)->time_to_sleep == ULLONG_MAX)
+		return (1);
+	(*table)->meals_to_eat = 0;
+	if (arguments[5])
+	{
+		(*table)->meals_to_eat = ft_atoll(arguments[5]);
+		if ((*table)->meals_to_eat == ULLONG_MAX)
+			return (1);
+	}
 	(*table)->full_philos = 0;
-    (*table)->simulation_end = false;
-    return (0);
+	(*table)->simulation_end = false;
+	(*table)->simulation_start = 0;
+	return (0);
 }
