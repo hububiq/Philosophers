@@ -1,2 +1,2 @@
 # Philosophers
-Dining philosophers problem. Multi-threading, data races and mutexes synchronization
+Dining philosophers problem. Concurrent programming - multi-threading, data races and mutexes synchronization
